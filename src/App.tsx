@@ -1,35 +1,33 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from 'react';
+import { supabase } from './lib/supabase';
 
-function App() {
-  const [count, setCount] = useState(0)
+function Page() {
+  const [todos, setTodos] = useState<any[]>([]); // Ensure TypeScript handles any[] for now
+
+  useEffect(() => {
+    const getTodos = async () => {
+      const { data: todos, error } = await supabase.from('todos').select();
+
+      if (error) {
+        console.error('Error fetching todos:', error);
+      } else if (todos && todos.length > 0) {
+        setTodos(todos);
+      }
+    };
+
+    getTodos(); // Call async function inside useEffect
+  }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div>
+      <h1>Todo List</h1>
+      <ul>
+        {todos.map((todo) => (
+          <li key={todo.id}>{todo.task}</li> 
+        ))}
+      </ul>
+    </div>
+  );
 }
 
-export default App
+export default Page;
