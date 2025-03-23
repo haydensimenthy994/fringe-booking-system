@@ -1,33 +1,16 @@
-import { useState, useEffect } from 'react';
-import { supabase } from './lib/supabase';
+// src/App.tsx
+import { Routes, Route } from 'react-router-dom';
+import EventsPage from './pages/public/Events';
 
-function Page() {
-  const [todos, setTodos] = useState<any[]>([]); // Ensure TypeScript handles any[] for now
-
-  useEffect(() => {
-    const getTodos = async () => {
-      const { data: todos, error } = await supabase.from('todos').select();
-
-      if (error) {
-        console.error('Error fetching todos:', error);
-      } else if (todos && todos.length > 0) {
-        setTodos(todos);
-      }
-    };
-
-    getTodos(); // Call async function inside useEffect
-  }, []);
-
+function App() {
   return (
-    <div>
-      <h1>Todo List</h1>
-      <ul>
-        {todos.map((todo) => (
-          <li key={todo.id}>{todo.task}</li> 
-        ))}
-      </ul>
+    <div className="min-h-screen bg-gray-950 text-white">
+      <Routes>
+        <Route path="/events" element={<EventsPage />} />
+        {/* Add more routes here if needed */}
+      </Routes>
     </div>
   );
 }
 
-export default Page;
+export default App;
