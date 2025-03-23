@@ -5,10 +5,8 @@ import {
   MapPin,
   Clock,
   Play,
-  Info,
   Search,
   Filter,
-  ShieldIcon,
   TicketIcon,
 } from 'lucide-react';
 import logo from '@/assets/logo.svg';
@@ -98,7 +96,7 @@ export default function EventsPage() {
 
   useEffect(() => {
     const fetchEvents = async () => {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('events')
         .select(
           `
