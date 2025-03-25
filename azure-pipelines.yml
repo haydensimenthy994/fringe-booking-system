@@ -1,22 +1,32 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
-- main
+  branches:
+    include:
+      - main
+      - dev
 
 pool:
   vmImage: ubuntu-latest
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+  - checkout: self
 
-- script: |
-    npm install -g netlify-cli
-    netlify deploy --dir=dist --prod --auth=$NETLIFY_AUTH_TOKEN --site=$NETLIFY_SITE_ID
-  displayName: 'Deploy to Netlify'
-  env:
-    NETLIFY_AUTH_TOKEN: $(NETLIFY_AUTH_TOKEN)
-    NETLIFY_SITE_ID: $(NETLIFY_SITE_ID)
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '18.x'
+    displayName: 'Install Node.js'
+
+  - script: |
+      npm install
+    displayName: 'Install dependencies'
+
+  - script: |
+      npm run build
+    displayName: 'Build app with Vite'
+
+  - script: |
+      npm install -g netlify-cli
+      netlify deploy --dir=dist --site=$NETLIFY_SITE_ID --auth=$NETLIFY_AUTH_TOKEN --prod
+    env:
+      NETLIFY_SITE_ID: $(NETLIFY_SITE_ID)
+      NETLIFY_AUTH_TOKEN: $(NETLIFY_AUTH_TOKEN)
+    displayName: 'Deploy to Netlify'
