@@ -1,13 +1,11 @@
 trigger:
   branches:
     include:
+      - dev
       - main
 
 pool:
   vmImage: 'ubuntu-latest'
-
-variables:
-  - group: NetlifySecrets
 
 steps:
   - task: NodeTool@0
@@ -17,10 +15,16 @@ steps:
 
   - script: |
       npm install
+    displayName: 'Install dependencies'
+
+  - script: |
       npm run build
-    displayName: 'Build Vite Project'
+    displayName: 'Build app with Vite'
 
   - script: |
       npm install -g netlify-cli
-      netlify deploy --prod --dir=dist --auth=$NETLIFY_AUTH_TOKEN --site=$NETLIFY_SITE_ID
+      netlify deploy --prod --dir=dist --site=$NETLIFY_SITE_ID --auth=$NETLIFY_AUTH_TOKEN
+    env:
+      NETLIFY_AUTH_TOKEN: $(NETLIFY_AUTH_TOKEN)
+      NETLIFY_SITE_ID: $(NETLIFY_SITE_ID)
     displayName: 'Deploy to Netlify'
