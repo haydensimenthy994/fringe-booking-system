@@ -1,7 +1,4 @@
 # Starter pipeline
-# Build and deploy your project to Netlify from Azure DevOps
-# https://aka.ms/yaml
-
 trigger:
 - main
 
@@ -16,15 +13,15 @@ steps:
 - script: npm install
   displayName: 'Install dependencies'
 
-# Patch tsconfig.json to allow unused variables (prevents build failure)
+# Patch tsconfig.json to allow unused variables (simple shell method)
 - script: |
-    echo "Patching tsconfig.json..."
-    jq '.compilerOptions.noUnusedLocals = false | .compilerOptions.noUnusedParameters = false' tsconfig.json > tsconfig-patched.json
-    mv tsconfig-patched.json tsconfig.json
-  displayName: 'Relax TypeScript strictness (temp fix)'
+    echo "Patching tsconfig.json to disable noUnusedLocals and noUnusedParameters..."
+    sed -i 's/"noUnusedLocals": true/"noUnusedLocals": false/' tsconfig.json || echo '"noUnusedLocals": false' >> tsconfig.json
+    sed -i 's/"noUnusedParameters": true/"noUnusedParameters": false/' tsconfig.json || echo '"noUnusedParameters": false' >> tsconfig.json
+  displayName: 'Relax TypeScript build rules'
   condition: succeeded()
 
-# Build your project
+# Build the project
 - script: npm run build
   displayName: 'Build project'
 
