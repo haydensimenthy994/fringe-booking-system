@@ -5,19 +5,19 @@ pool:
   vmImage: ubuntu-22.04
 
 variables:
-  buildFolder: dist  # Change this if your build outputs to something else like build or out
+- group: NetlifySecrets
+- name: buildFolder
+  value: dist
 
 steps:
 - script: echo "👋 Hello from the pipeline!"
   displayName: 'Say Hello'
 
-# Install dependencies
 - script: npm install
   displayName: 'Install dependencies'
 
-# Optional: Relax TypeScript strict rules
 - script: |
-    echo "🔧 Relaxing TypeScript strict rules"
+    echo "🔧 Relaxing TS rules"
     for file in tsconfig.json tsconfig.app.json tsconfig.node.json; do
       if [ -f "$file" ]; then
         echo "Patching $file"
@@ -27,18 +27,16 @@ steps:
         grep -q '"noUnusedParameters"' "$file" || sed -i '/"compilerOptions": {/a \    "noUnusedParameters": false,' "$file"
       fi
     done
-  displayName: 'Disable TS Unused Checks'
+  displayName: 'Relax TypeScript rules'
 
-# Build the project
 - script: npm run build
-  displayName: 'Build project'
+  displayName: '🛠️ Build project'
 
-# Deploy to Netlify via CLI
 - script: |
     npm install -g netlify-cli
     echo "🚀 Deploying to Netlify..."
-    netlify deploy --prod --dir=$(buildFolder) --auth=$NETLIFY_AUTH_TOKEN --site=$NETLIFY_SITE_ID
-  displayName: 'Deploy to Netlify'
+    netlify deploy --prod --dir=$(buildFolder) --auth=$(NETLIFY_AUTH_TOKEN) --site=$(NETLIFY_SITE_ID)
+  displayName: '🚀 Deploy to Netlify'
   env:
     NETLIFY_AUTH_TOKEN: $(NETLIFY_AUTH_TOKEN)
     NETLIFY_SITE_ID: $(NETLIFY_SITE_ID)
