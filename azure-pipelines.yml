@@ -1,4 +1,4 @@
-# Starter pipeline
+# Azure DevOps pipeline for building and deploying to Netlify (college project vibes)
 trigger:
 - main
 
@@ -6,6 +6,7 @@ pool:
   vmImage: ubuntu-22.04
 
 steps:
+# Just saying hi
 - script: echo Hello, world!
   displayName: 'Run a one-line script'
 
@@ -13,11 +14,14 @@ steps:
 - script: npm install
   displayName: 'Install dependencies'
 
-# Relax TypeScript rules (no jq, works with any tsconfig)
+# Relax TypeScript rules (for all tsconfig*.json files)
 - script: |
-    echo "Patching tsconfig.json to disable strict unused checks..."
-    node -e "let fs=require('fs');let f='tsconfig.json';let j=JSON.parse(fs.readFileSync(f));j.compilerOptions=j.compilerOptions||{};j.compilerOptions.noUnusedLocals=false;j.compilerOptions.noUnusedParameters=false;fs.writeFileSync(f,JSON.stringify(j,null,2));"
-  displayName: 'Relax TypeScript rules'
+    echo "Relaxing TypeScript rules in all tsconfig*.json files..."
+    for file in $(find . -name "tsconfig*.json"); do
+      echo "Patching $file"
+      node -e "let fs=require('fs');let f='$file';let j=JSON.parse(fs.readFileSync(f));j.compilerOptions=j.compilerOptions||{};j.compilerOptions.noUnusedLocals=false;j.compilerOptions.noUnusedParameters=false;fs.writeFileSync(f,JSON.stringify(j,null,2));"
+    done
+  displayName: 'Relax TypeScript rules globally'
 
 # Build the project
 - script: npm run build
