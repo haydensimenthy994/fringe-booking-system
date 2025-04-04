@@ -13,6 +13,15 @@ steps:
 - script: echo Hello, world!
   displayName: 'Run a one-line script'
 
+# Install dependencies
+- script: npm install
+  displayName: 'Install dependencies'
+
+# Build your project (assuming your build output goes to `dist/`)
+- script: npm run build
+  displayName: 'Build project'
+
+# Deploy to Netlify
 - script: |
     npm install -g netlify-cli
     netlify deploy --dir=dist --prod --auth=$NETLIFY_AUTH_TOKEN --site=$NETLIFY_SITE_ID
