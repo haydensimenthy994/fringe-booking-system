@@ -6,6 +6,7 @@ pool:
 
 variables:
 - group: NetlifySecrets
+- group: BuildSecrets 
 - name: buildFolder
   value: dist
 
@@ -40,5 +41,3 @@ steps:
   env:
     NETLIFY_AUTH_TOKEN: $(NETLIFY_AUTH_TOKEN)
     NETLIFY_SITE_ID: $(NETLIFY_SITE_ID)
-    VITE_SUPABASE_URL: $(VITE_SUPABASE_URL)
-    VITE_SUPABASE_ANON_KEY: $(VITE_SUPABASE_ANON_KEY)
