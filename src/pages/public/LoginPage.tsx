@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, FormEvent, ChangeEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, type FormEvent, type ChangeEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import logo from '@/assets/logo.svg';
 import { supabase } from '@/lib/supabaseClient';
 
 const validateEmail = (email: string) =>
@@ -32,6 +31,8 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState('');
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -76,6 +77,30 @@ export default function LoginPage() {
             },
           },
         });
+
+        if (result.error) {
+          throw result.error;
+        }
+
+        setPopupMessage('Account created successfully! ');
+        setShowPopup(true);
+
+        // Reset form and switch to Sign In mode
+        setFormData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          password: '',
+        });
+        setPasswordStrength('');
+        setIsSignUp(false);
+
+        // Optional small delay before redirect
+        setTimeout(() => {
+          setShowPopup(false);
+          navigate('/login');
+        }, 2000); // 2s delay to let popup show
+        return;
       } else {
         // 1. Sign in with Supabase
         result = await supabase.auth.signInWithPassword({
@@ -93,22 +118,6 @@ export default function LoginPage() {
         }
 
         // 3. Get first and last name from Supabase metadata
-        const storedFirst = userData.user.user_metadata.first_name
-          ?.trim()
-          .toLowerCase();
-        const storedLast = userData.user.user_metadata.last_name
-          ?.trim()
-          .toLowerCase();
-
-        // 4. Compare to form inputs
-        const inputFirst = formData.firstName.trim().toLowerCase();
-        const inputLast = formData.lastName.trim().toLowerCase();
-
-        if (storedFirst !== inputFirst || storedLast !== inputLast) {
-          await supabase.auth.signOut();
-          setError('First name or last name does not match our records.');
-          return;
-        }
 
         // 5. All good
         navigate('/home');
@@ -126,11 +135,18 @@ export default function LoginPage() {
       return;
     }
 
-    const { error } = await supabase.auth.resetPasswordForEmail(formData.email);
+    const { error } = await supabase.auth.resetPasswordForEmail(
+      formData.email,
+      {
+        redirectTo: 'https://adelaide-fringe.netlify.app/reset-password',
+      }
+    );
+
     if (error) {
       setError(error.message);
     } else {
-      alert('Password reset email sent. Check your inbox.');
+      setPopupMessage('Password reset email sent. Check your inbox.');
+      setShowPopup(true);
     }
   };
 
@@ -153,30 +169,33 @@ export default function LoginPage() {
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* First & Last Name - always visible */}
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">First Name</Label>
-                    <Input
-                      id="firstName"
-                      placeholder="John"
-                      className="border-[#3a3a4a] bg-[#252532] text-white focus:border-pink-500 focus:ring-pink-500"
-                      value={formData.firstName}
-                      onChange={handleChange}
-                      required={isSignUp} // ✅ Only required for sign-up
-                    />
+                {/* First & Last Name - only show for Sign Up */}
+                {isSignUp && (
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="firstName">First Name</Label>
+                      <Input
+                        id="firstName"
+                        placeholder="John"
+                        className="border-[#3a3a4a] bg-[#252532] text-white focus:border-pink-500 focus:ring-pink-500"
+                        value={formData.firstName}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="lastName">Last Name</Label>
+                      <Input
+                        id="lastName"
+                        placeholder="Doe"
+                        className="border-[#3a3a4a] bg-[#252532] text-white focus:border-pink-500 focus:ring-pink-500"
+                        value={formData.lastName}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">Last Name</Label>
-                    <Input
-                      id="lastName"
-                      placeholder="Doe"
-                      className="border-[#3a3a4a] bg-[#252532] text-white focus:border-pink-500 focus:ring-pink-500"
-                      value={formData.lastName}
-                      onChange={handleChange}
-                      required={isSignUp} // ✅ Only required for sign-up
-                    />
-                  </div>
-                </div>
+                )}
 
                 {/* Email */}
                 <div className="space-y-2">
@@ -301,6 +320,47 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
+      {/* Custom Popup */}
+      {showPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="w-full max-w-md rounded-lg bg-[#1a1a24] p-6 shadow-lg">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-xl font-bold text-pink-500">Success</h3>
+              <button
+                onClick={() => setShowPopup(false)}
+                className="rounded-full p-1 hover:bg-[#252532]"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-gray-400"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+            <div className="mb-4">
+              <p className="text-gray-300">{popupMessage}</p>
+            </div>
+            <div className="flex justify-end">
+              <Button
+                onClick={() => setShowPopup(false)}
+                className="bg-pink-500 text-white hover:bg-pink-600"
+              >
+                OK
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
