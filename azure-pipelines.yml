@@ -5,8 +5,8 @@ pool:
   vmImage: ubuntu-22.04
 
 variables:
-- group: NetlifySecrets
-- group: BuildSecrets 
+- group: NetlifySecrets           # Includes NETLIFY_AUTH_TOKEN & NETLIFY_SITE_ID
+- group: BuildSecrets             # Includes VITE_SUPABASE_URL & VITE_SUPABASE_ANON_KEY
 - name: buildFolder
   value: dist
 
@@ -16,11 +16,11 @@ steps:
 
 # Install dependencies
 - script: npm install
-  displayName: 'Install dependencies'
+  displayName: '📦 Install dependencies'
 
-# Optional: Relax TypeScript strict rules
+# Relax TypeScript rules for unused vars
 - script: |
-    echo "🔧 Relaxing TS rules"
+    echo "🔧 Relaxing TypeScript rules..."
     for file in tsconfig.json tsconfig.app.json tsconfig.node.json; do
       if [ -f "$file" ]; then
         echo "Patching $file"
@@ -30,21 +30,21 @@ steps:
         grep -q '"noUnusedParameters"' "$file" || sed -i '/"compilerOptions": {/a \    "noUnusedParameters": false,' "$file"
       fi
     done
-  displayName: 'Relax TypeScript rules'
+  displayName: '🛠️ Relax TypeScript rules'
 
-# Build project (injecting Supabase env vars)
+# Build the project using Supabase env vars
 - script: |
     echo "🔨 Building with Supabase env..."
-    tsc -b || echo "⚠️ Skipping TS errors"
-    vite build
-  displayName: '🛠️ Build project'
+    tsc -b || echo "⚠️ TypeScript failed, continuing..."
+    npx vite build
+  displayName: '🧱 Build project'
   env:
     VITE_SUPABASE_URL: $(VITE_SUPABASE_URL)
     VITE_SUPABASE_ANON_KEY: $(VITE_SUPABASE_ANON_KEY)
 
-# Optional: Confirm dist folder exists
+# Confirm dist folder exists
 - script: ls -la $(buildFolder)
-  displayName: '📦 Check dist folder contents'
+  displayName: '📁 Check dist/ contents'
 
 # Deploy to Netlify
 - script: |
