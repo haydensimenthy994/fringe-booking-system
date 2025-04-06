@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+import { Label } from '@/components/ui/label-admin';
 import { Checkbox } from '@/components/ui/checkbox';
 import { LockIcon, MailIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
