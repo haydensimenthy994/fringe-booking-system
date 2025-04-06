@@ -19,7 +19,7 @@ import { Badge } from '@/components/ui/badge';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import ProfileMenu from '@/components/ProfileMenu';
+import ProfileMenu from '@/pages/public/ProfileMenu';
 import {
   Select,
   SelectContent,

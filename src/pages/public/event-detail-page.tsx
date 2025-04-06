@@ -9,8 +9,8 @@ import { supabase } from '@/lib/supabaseClient';
 import { Button } from '@/components/ui/button';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator-admin';
-import ProfileMenu from '@/components/ProfileMenu';
+import { Separator } from '@/components/ui/separator';
+import ProfileMenu from '@/pages/public/ProfileMenu';
 import {
   Dialog,
   DialogContent,

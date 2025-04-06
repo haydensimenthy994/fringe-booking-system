@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label-admin';
 import { Textarea } from '@/components/ui/textarea';
 import logo from '@/assets/logo.svg';
-import ProfileMenu from '@/components/ProfileMenu';
+import ProfileMenu from '@/pages/public/ProfileMenu';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({

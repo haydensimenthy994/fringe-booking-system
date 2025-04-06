@@ -12,7 +12,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import ProfileMenu from '@/components/ProfileMenu';
+import ProfileMenu from '@/pages/public/ProfileMenu';
 
 interface Event {
   id: string;
