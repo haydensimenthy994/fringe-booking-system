@@ -15,7 +15,8 @@ steps:
     displayName: 'Say Hello'
 
   # Install dependencies
-  - script: npm install
+  - script: npm install --legacy-peer-deps
+
     displayName: '📦 Install dependencies'
 
   # Relax TypeScript rules for unused vars
