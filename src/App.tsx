@@ -49,7 +49,7 @@ function App() {
         <AuthRedirectHandler />
         <Routes>
           {/* Public Routes */}
-          <Route path="/" element={<Navigate to="/login" />} />
+          <Route path="/" element={<Navigate to="/home" />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/home" element={<EventsPage />} />
           <Route path="/events" element={<AllEventsPage />} />
